@@ -1,5 +1,5 @@
 from dice.logic.profiles import getProfileSet, addProfileSet, writeToJson 
-from dice.utils.command_utils import validatePrivateContext, getObjAndArgs
+from dice.utils.command_utils import validatePrivateContext, getObjAndArgs, getArgsByOpts
 
 def setCommand(ctx, command):
     validatePrivateContext(ctx)
@@ -19,7 +19,9 @@ def addCommand(ctx, command):
     profileSet = getOrMakeProfileSet(ctx)    
     obj, args = getObjAndArgs(command)
     if obj == "roll":
-        name, dice = getObjAndArgs(args)
+        optsAndArgs = getArgsByOpts(["-n", "-r"], args)
+        name = optsAndArgs["-n"]
+        dice = optsAndArgs["-r"]
         profileSet.addRoll(name, dice)
         return "Added " + name + " as " + dice 
     elif obj == "profile":

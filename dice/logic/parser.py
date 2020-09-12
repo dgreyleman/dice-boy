@@ -31,6 +31,12 @@ class ConstantComponent(BaseComponent):
         countInt = int(self.count)
         return countInt, [countInt]
 
+SUB_PLUS = r"\s*\+\s*"
+SUB_MINUS = r"\s*\-\s*"
+SEPARATE_COMPONENTS = r"[^\+\-]+|\+|\-"
+SIMPLE_COMPONENT_MATCH = r"\b([0-9]+d[0-9]+|[0-9]+)\b" 
+COMPLEX_COMPONENT_MATCH = r"([0-9]+d[0-9]+|[0-9]+|\+|\-)"
+
 def parseSingle(rollString) -> "BaseComponent":
     rollString = rollString.lower().replace(" ", "")
     if "d" in rollString:
@@ -48,17 +54,22 @@ def parseSingle(rollString) -> "BaseComponent":
             roll.die += c
     return roll
 
-def parse(rollString, nameMap): 
-    components = re.findall(r"\w+|\+|\-", rollString)
-    ops = []
-    rolls = []
-    decipheredRollString = ""
+def mapNameToBaseRolls(rollString, mapNameToRoll):
+    components = re.sub(SUB_PLUS, "+", rollString)
+    components = re.sub(SUB_MINUS, "-", components)
+    components = re.findall(SEPARATE_COMPONENTS, components)
+    decipheredComponents = []
     for component in components:
-        if component == "+" or component == "-":
-            decipheredRollString += component
+        if component == "+" or component == "-" or re.fullmatch(SIMPLE_COMPONENT_MATCH, component):
+            decipheredComponents += [component]
         else:
-            decipheredRollString += nameMap(component)
-    components = re.findall(r"\w+|\+|\-", decipheredRollString)
+            decipheredComponents += mapNameToBaseRolls(mapNameToRoll(component), mapNameToRoll)
+    return decipheredComponents
+
+def parse(rollString, mapNameToRoll): 
+    rolls = []
+    ops = []
+    components = mapNameToBaseRolls(rollString, mapNameToRoll)
     for component in components:
         if component == "+" or component == "-":
             ops.append(component)

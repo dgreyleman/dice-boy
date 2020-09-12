@@ -1,4 +1,4 @@
-from logging import basicConfig, INFO
+from logging import basicConfig, INFO, info
 from discord.ext import commands
 from dice.logic.env import token
 from dice.commands.roll_commands import parseRollString
