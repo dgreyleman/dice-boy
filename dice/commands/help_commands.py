@@ -1,5 +1,3 @@
-from dice.utils.command_utils import validatePrivateContext
-
 welcome = """Welcome to dice-boy!
 You can learn about the following features using the "/help <feature>" command.
 /help rolls
@@ -7,7 +5,7 @@ You can learn about the following features using the "/help <feature>" command.
 /help votes
 """
 
-rollHelp = """My primary purpose is to roll dice! You can do that really easily by typing /roll followed by a dice command.
+rollHelp = """My primary purpose is to roll dice! You can do that really easily by typing /roll or /r followed by a dice command.
 Dice commands follow the same syntax you see in various tabletop RPG rules. A number, followed by a d (or D), followed by another number.
 
 E.g.
@@ -17,7 +15,7 @@ E.g.
 
 /roll 1d4
 /roll 2d6
-/roll 1d20
+/r 1d20
 
 The first number represents the number of dice to roll. The second number represents the number of sides on the dice.
 
@@ -34,17 +32,19 @@ E.g.
 1d20 + 5 + 2d6 - 3
 4d6 + 4d6 + 4d6
 
-Finally, you can also save dice rolls for use later. Use the "/add roll" command followed by the name of the roll and the dice of the roll.
+Finally, you can also save dice rolls for use later. Use the "/add roll" command followed by the options '-n <name>' and '-r <roll>'.
 
 E.g.
-/add roll perception 1d20+3
-/add roll rage_damage 1d12 + 5 + 2
+/add roll -n perception -r 1d20+3
+/add roll -n rage damage -r 1d12 + 5 + 2
+/add roll -n stealth -r 1d20 + wis + proficiency
 
 You can then use those rolls using the "/roll" command and the name instead of the dice command.
 
 E.g.
 /roll perception
-/roll rage_damage
+/roll rage damage
+/r stealth
 
 You can also list all of the rolls available using the "/list rolls" command.
 
@@ -122,12 +122,61 @@ E.g.
 /vote "None" # no longer works since "A sample vote" is the most recent vote.
 /vote "Nay"  # works fine"""
 
+TEMPLATE_HELP = """You can easily import a new character to dice-boy using the template command. Templates allow the dice-boy admin to create custom rules and rolls for various systems.
+
+To import a character from a template, use the "/template install" command, followed by the options "-t <template name>" "-n <profile name>" "-p <template parameters>"
+
+E.g.
+/template install -t dnd -n Matilda Sonous -p 0, 1, 2, 5, 3, 3
+
+After installing, the template will offer optional tips to help complete your new profile. Some of these tips will suggest to use template actions. Template actions will help set up your new profile. Invoke an action using the "/template action" command followed by the options "-t <template name>" "-a <action name>" "-p <action parameters>"
+
+E.g.
+/template action -t dnd -a make proficient -p acrobatics, athletics, survival, stealth
+
+To learn more about a template, use the "/template list" command, followed by the options "-t <template name>" and "-p <property name>". Possible properties are "actions" and "params".
+
+E.g.
+> /template list -t dnd -p params
+> str, dex, con, int, wis, cha
+
+To learn more about an action, use the "/template detail" command, followed by the name of the action.
+
+E.g.
+> /template detail make proficient
+> {r}{1} = {*1} + proficiency
+
+The result of this command is the definition of the action. Symbols are defined as follows:
+    {r} - Always found at the beginning of the definition, means that the action can be repeated if X times if X * N parameters are provided, where N is the number of parameters required for one invocation of the action.
+    {N} - Means that the Nth parameter provided to the action will be substituted directly into the action definition. Can be any number >= 1. Indexing begins at 1. 
+    {*N} - Means that the Nth parameter provided to the action will be interpreted as the name of a roll and looked up, and the value of the roll will be substitued into the action definition.
+
+E.g.
+{r}{1} = {*1} + proficiency
+    {r} - The action will be repeated. Because it only takes 1 parameter, it will be repeated for each provided parameter.
+    {1}/{*1} - The action expects the first and only parameter to be the name of a roll.
+=> This action will update an existing action to be equal to it's previous value + proficiency
+
+Imagine the existing rolls
+
+proficiency = 2
+wis = 3
+dex = 2
+stealth = 1d20 + dex
+survival = 1d20 + wis
+
+/template action -t dnd -a make proficient -p stealth, survival
+
+This action will execute twice.
+
+{1} = stealth, {*1} = 1d20 + dex
+stealth = 1d20 + dex + proficiency
+    
+{1} = survival, {*1} = 1d20 + wis
+survival = 1d20 + wis + proficiency"""
+
+
 async def helpCommand(ctx, subject):
-    try:
-        validatePrivateContext(ctx)
-    except:
-        await ctx.send("Sorry, try that again in a DM to me!")
-        return
     if subject is None:
         await sendText(ctx, welcome) 
     elif "roll" in subject.lower():
@@ -136,6 +185,8 @@ async def helpCommand(ctx, subject):
         await sendText(ctx, profileHelp) 
     elif "vote" in subject.lower():
         await sendText(ctx, voteHelp) 
+    elif "template" in subject.lower():
+        await sendText(ctx, TEMPLATE_HELP)
 
 # TODO constants file?
 maxMessageLength = 2000

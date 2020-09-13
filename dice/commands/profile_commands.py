@@ -1,9 +1,9 @@
 from dice.logic.profiles import getProfileSet, addProfileSet, writeToJson 
-from dice.utils.command_utils import validatePrivateContext, getObjAndArgs, getArgsByOpts
+from dice.utils.command_utils import getObjAndArgs, getArgsByOpts
+from dice.logic.templates import Template
 
-def setCommand(ctx, command):
-    validatePrivateContext(ctx)
-    profileSet = getOrMakeProfileSet(ctx)
+def setCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)
     obj, args = getObjAndArgs(command)
     if obj == "profile":
         profileSet.setProfile(args)
@@ -14,14 +14,13 @@ def setCommand(ctx, command):
     else:
         return "You cannot set " + obj
 
-def addCommand(ctx, command):
-    validatePrivateContext(ctx)
-    profileSet = getOrMakeProfileSet(ctx)    
+def addCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)    
     obj, args = getObjAndArgs(command)
     if obj == "roll":
-        optsAndArgs = getArgsByOpts(["-n", "-r"], args)
-        name = optsAndArgs["-n"]
-        dice = optsAndArgs["-r"]
+        opts = getArgsByOpts(["-n", "-r"], args)
+        name = opts["-n"]
+        dice = opts["-r"]
         profileSet.addRoll(name, dice)
         return "Added " + name + " as " + dice 
     elif obj == "profile":
@@ -30,13 +29,12 @@ def addCommand(ctx, command):
     else:
         return "You cannot add " + obj
 
-def getRoll(ctx, rollString):
-    profileSet = getOrMakeProfileSet(ctx)
+def getRoll(name, rollString):
+    profileSet = getOrMakeProfileSet(name)
     return profileSet.getRoll(rollString)["roll"]
 
-def listCommand(ctx, command):
-    validatePrivateContext(ctx)
-    profileSet = getOrMakeProfileSet(ctx)
+def listCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)
     if command == "profile" or command == "profiles":
         profiles = profileSet.getAllProfiles()
         currentProfile = profileSet.getCurrentProfile()
@@ -51,27 +49,51 @@ def listCommand(ctx, command):
     else:
         return result
 
+def templateCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)
+    obj, args = getObjAndArgs(command)
+    if obj == "install":
+        opts = getArgsByOpts(["-t", "-n", "-p"], args)
+        profileSet.addAndSetProfile(opts["-n"])
+        template = Template(opts["-t"])
+        template.installToProfile(profileSet, opts["-p"])
+        return template.template["tips"]
+    elif obj == "action":
+        opts = getArgsByOpts(["-t", "-a", "-p"], args)
+        template = Template(opts["-t"]) 
+        try:
+            return [template.performAction(profileSet, opts["-a"], opts["-p"])]
+        except Exception as err:
+            return ["Cannot perform action " + opts["-a"] + ": " + str(err)]
+    elif obj == "list":
+#       opts = getArgsByOpts(["-t", "-p"], args)
+#       template = Template(
+        return ["This feature coming soon!"]
+    elif obj == "detail":
+        return ["This feature coming soon!"]
+    else:
+        return [f"You cannot {command} a template"]
+        
 def mapProfileId(profile, currentProfile):
     profileId = profile["id"]
     if profileId == currentProfile["id"]:
         profileId += " *"
     return profileId
 
-def renameCommand(ctx, command):
-    validatePrivateContext(ctx)
-    profileSet = getOrMakeProfileSet(ctx)
+def renameCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)
 
-def deleteCommand(ctx, command):
-    validatePrivateContext(ctx)
-    profileSet = getOrMakeProfileSet(ctx)
+def deleteCommand(name, command):
+    profileSet = getOrMakeProfileSet(name)
 
 def saveCommand():
     writeToJson()
 
-def getOrMakeProfileSet(ctx):
+def getOrMakeProfileSet(name):
     try:
-        return getProfileSet(ctx.message.author.name)
+        #return getProfileSet(ctx.message.author.name)
+        return getProfileSet(name)
     except:
-        addProfileSet(ctx.message.author.name)
-        return getProfileSet(ctx.message.author.name)
+        addProfileSet(name)
+        return getProfileSet(name)
 

@@ -4,7 +4,7 @@ from random import randrange
 
 def parseRollString(ctx, rollString):
     try:
-        total, rolls = parse(rollString, lambda r : getRoll(ctx, r))
+        total, rolls = parse(rollString, lambda r : getRoll(ctx.message.author.name, r))
     except:
         return "Sorry, that is not a valid roll!"
     firstRoll = rolls.pop(0)
@@ -15,5 +15,5 @@ def parseRollString(ctx, rollString):
         else:
             result += " + " + str(roll)
     result += ")"
-    return "{.author.display_name} => ".format(ctx.message) + result
+    return f"{ctx.message.author.display_name} => {result}"
 
