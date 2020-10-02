@@ -76,6 +76,11 @@ class ProfileSet:
             "rolls": []
         })
 
+    def addAndSetProfile(self, profileId):
+        if not self.__hasProfile(profileId):
+            self.addProfile(profileId)
+        self.setProfile(profileId) 
+
     def renameProfile(self, oldId, newId):
         if self.__hasProfile(newId):
             raise ValueError("That profile already exists")

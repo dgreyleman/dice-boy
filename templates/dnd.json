@@ -1,0 +1,164 @@
+{
+    "required_params": [
+        "str",
+        "dex",
+        "con",
+        "int",
+        "wis",
+        "cha"
+    ],
+    "install": [
+        "skills",
+        "saving_throws",
+        "attacks",
+        "misc"
+    ],
+    "skills": [
+        {
+            "name": "acrobatics",
+            "roll": "1d20 + dex"
+        },
+        {
+            "name": "animal handling",
+            "roll": "1d20 + wis"
+        },
+        {
+            "name": "arcana",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "athletics",
+            "roll": "1d20 + str" 
+        },
+        {
+            "name": "deception",
+            "roll": "1d20 + cha" 
+        },
+        {
+            "name": "history",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "insight",
+            "roll": "1d20 + wis" 
+        },
+ 
+        {
+            "name": "intimidation",
+            "roll": "1d20 + cha" 
+        },
+        {
+            "name": "investigation",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "medicine",
+            "roll": "1d20 + wis" 
+        },
+        {
+            "name": "nature",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "perception",
+            "roll": "1d20 + wis" 
+        },
+        {
+            "name": "performance",
+            "roll": "1d20 + cha" 
+        },
+        {
+            "name": "persuasion",
+            "roll": "1d20 + cha" 
+        },
+        {
+            "name": "religion",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "sleight of hand",
+            "roll": "1d20 + dex" 
+        },
+        {
+            "name": "stealth",
+            "roll": "1d20 + dex" 
+        },
+        {
+            "name": "survival",
+            "roll": "1d20 + wis" 
+        }
+    ],
+    "saving_throws": [
+        {
+            "name": "strength saving throw",
+            "roll": "1d20 + str" 
+        },
+        {
+            "name": "dexterity saving throw",
+            "roll": "1d20 + dex" 
+        },
+        {
+            "name": "constitution saving throw",
+            "roll": "1d20 + con" 
+        },
+        {
+            "name": "intelligence saving throw",
+            "roll": "1d20 + int" 
+        },
+        {
+            "name": "wisdom saving throw",
+            "roll": "1d20 + wis" 
+        },
+        {
+            "name": "charisma saving throw",
+            "roll": "1d20 + cha" 
+        }
+    ],
+    "attacks": [
+        {
+            "name": "unarmed",
+            "roll": "1d20 + str + proficiency"
+        },
+        {
+            "name": "melee",
+            "roll": "1d20 + str"
+        },
+        {
+            "name": "finesse",
+            "roll": "1d20 + dex"
+        },
+        {
+            "name": "ranged",
+            "roll": "1d20 + dex"
+        }
+    ],
+    "misc": [
+        {
+            "name": "initiative",
+            "roll": "1d20 + dex"
+        },
+        {
+            "name": "proficiency",
+            "roll": "2"
+        },
+        {
+            "name": "passive wisdom",
+            "roll": "10 + wis"
+        }
+    ],
+    "tips": [
+        "Remember to set your hit die roll with the 'set hit die' action.",
+        "Remember to set any proficiencies with the 'make proficient' action.",
+        "Remember to update your proficiency bonus if you have more than plus 2."
+    ],
+    "actions": [
+        {
+            "name": "make proficient",
+            "definition": "{r}{1} = {*1} + proficiency"
+        },
+        {
+            "name": "set hit die",
+            "definition": "hit die = {1} + con"
+        }
+    ]
+}
